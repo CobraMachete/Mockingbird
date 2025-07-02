@@ -1,0 +1,1333 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>ftrack AE Dev 1.2.0</title>
+	
+    <!-- FONTS -->
+	<!-- <link rel="preconnect" href="https://fonts.googleapis.com"/>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"/> -->
+
+	<link rel="preconnect" href="https://rsms.me/">
+	<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+	
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="css/taskopen.css">
+	<link rel="stylesheet" href="css/taskpublish.css">
+	<link rel="stylesheet" href="css/taskbrowser.css">
+	<link rel="stylesheet" href="css/renderpub.css">
+	<link rel="stylesheet" href="css/nice-select.css">
+	<link rel="stylesheet" href="css/render-settings.css">
+	<link rel="stylesheet" href="css/context.standalone.css">
+	<link rel="stylesheet" href="css/contextstyle.css">
+	<link rel="stylesheet" href="css/bootstrap-icons.css">
+	<link rel="stylesheet" href="js/switchery/switchery.css">
+	
+
+	<!-- RIVE -->
+	<script type="text/javascript" src="js/rive/rive_loader.js"></script>
+
+	
+
+	<!--  PRIMARY DATA OBJECT FROM ENV AND TASKS  -->
+	<script type="text/javascript" src="js/data/global-task-data.js"></script>
+
+    <!-- BOOTSTRAP FTRACK INTEGRATION -->
+    <script type="text/javascript" src="js/ftrackbs/bootstrap-dcc.js"></script>
+    <script type="text/javascript" src="js/ftrackbs/bootstrap.js"></script>
+    <script type="text/javascript" src="js/ftrackbs/event-constants.js"></script>
+    <script type="text/javascript" src="js/ftrackbs/events-core.js"></script>
+    <script type="text/javascript" src="js/ftrackbs/utils.js"></script>
+
+	<!-- LOGGING -->
+	 
+	<!-- <script type="text/javascript" src="js/logging/logger.js"></script> -->
+	<script type="text/javascript" src="js/rush/client.js"></script>
+	<script type="text/javascript" src="js/logging/logger.js"></script>
+
+    <!-- LAUNCH PREFLIGHT -->
+    <script type="text/javascript" src="js/launch/ae-open-preflight.js"></script>
+
+	<!-- UI TEXT -->
+    <script type="text/javascript" src="js/text/text-manager.js"></script>
+
+	<!-- UI ELEMENTS HANDLER -->
+	<script type="text/javascript" src="js/ui/ui-handler.js"></script>
+
+    <!-- CHATTERBOX BRIDGE -->
+    <script type="text/javascript" src="js/chatterbox/chatterbox-constants.js"></script>
+    <script type="text/javascript" src="js/chatterbox/chatterbox.js"></script>
+	<script type="text/javascript" src="js/chatterbox/chatterbox-helpers.js"></script>
+
+	<!-- RENDER MANAGEMENT -->
+	<script type="text/javascript" src="js/render-manager/init-render-sequence.js"></script>
+	<script type="text/javascript" src="js/render-manager/render-handler.js"></script>
+	<script type="text/javascript" src="js/render-manager/render-queue.js"></script>
+	<script type="text/javascript" src="js/render-manager/merge-queue.js"></script>
+	<script type="text/javascript" src="js/render-manager/ftrack-helper.js"></script>
+
+	<!-- RUSH -->
+	<script type="text/javascript" src="js/rush/rush-job-submit.js"></script>
+	<script type="text/javascript" src="js/rush/rush-helpers.js"></script>
+	
+	
+	<!-- RENDER WATCHER -->
+	<!-- <script type="text/javascript" src="js/rush/render-watcher.js"></script> -->
+
+	<!-- MESSAGE MANAGEMENT -->
+	<script type="text/javascript" src="js/messages/message-manager.js"></script>
+
+	<!-- PUBLISH MANAGEMENT -->
+	<script type="text/javascript" src="js/render-manager/publish-queue.js"></script>
+
+	<!-- RIVE RENDER ROWS -->
+	<script type="text/javascript" src="js/renderrows/riveprogressbar.js"></script>
+	<script type="text/javascript" src="js/renderrows/renderrowdataobject.js"></script>
+
+	<!-- HOUSECLEANING -->
+	<script type="text/javascript" src="js/cleanup/ae-log-removal.js"></script>
+
+	<!-- PREFERENCES -->
+	<script type="text/javascript" src="js/prefs/prefs.js"></script>
+
+	<!-- CUSTOM JS -->
+	<script type="text/javascript" src="./ext.js"></script>
+	
+	<!-- ADDITIONAL JS -->
+	<script type="text/javascript" src="js/lib/CSInterface.js"></script>
+	<script type="text/javascript" src="js/lib/Vulcan.js"></script>
+	
+	<!-- JQUERY -->
+	<script src="js/utils/jquery.1.9.1.js"></script>
+	<script src="js/utils/jquery.nice-select.js"></script>
+	<script src="js/switchery/switchery.js"></script>
+	
+	
+	<style>
+		body {
+			font-family: "Inter" !important;
+			background-color: #171A1D !important;
+			font-style: normal;
+		}
+    </style>
+
+	<script type="text/javascript">
+		
+		var taskHeadState = 0;
+		var shotHeadState = 0;
+		var multiHeadState = 0;
+
+		var hasMulitcomp = false;
+		var overlayActive = false;
+		
+
+		var tasknavarr = [];
+		var projecttree;
+
+		var renderSearchList;
+
+		var gblPresetArr;
+		var prjFilenameIso;
+		var prjFileDir;
+		var settingsIsOpen = false;
+		var maxAeInstances = 2;
+		var canUseMFR, canIgnoreMissing, alertOnFinish;
+		var isRightClicking = false;
+		var rotatorCycle = 0;
+		var activeInstances = 0;
+		var doneRows = 0;
+		var activeRow = 0;
+		var killedProcesses = 0;
+		var abortInit = false;
+		var instancesAtAbort = 0;
+		var killRotator = 0;
+		var currOpenPrj = "None";
+
+		const watcherProcesses = [];
+
+	</script>
+
+
+	
+</head>
+<body onload="onLoaded(), importAECodecSettings(), initGlobalEnvVars(), initializeIntegration(), checkDocsFolder(), copyNodeBins(), copyFFDirBins(), checkIfUserPrefs(), regKeyEvents(), regKeyEventsDebugWindow(), regResizeListener(), launchContainerMutationObserver(); launchTableMutationObserver();">
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			
+			$('select').niceSelect();
+
+			
+			//EVENT LISTENER FOR REMAPPING VERTICAL SCROLL TO HORIZONTAL
+			var bccontainer = document.getElementById("breadcrumbcontrow");
+			bccontainer.addEventListener("wheel", function(e) {
+				if (Math.abs(e.deltaY) > 0) {
+					e.preventDefault();
+					bccontainer.scrollLeft +=e.deltaY;
+				}
+			}, {capture: true});
+
+
+			
+			var taskfilterbox = document.getElementById("searchbar");
+			var activetasktable = document.getElementById("tblebody");
+
+
+
+			var masterdata;
+			var remote_integration_session_id;
+			var GLOBAL_FTRACK_SESSION;
+			var ENV_VARS;
+			var APP_VER;
+
+			var VERSION_MASTER_NUM_A, VERSION_MASTER_NUM_B;
+			var ASSET_MASTER_NUM_A, ASSET_MASTER_NUM_B;
+			var TASK_MASTER_NUM_A, TASK_MASTER_NUM_B;
+
+			
+			initRiveLoader();
+			initRiveUIElements();
+			initRiveButtons(); 
+			initRiveSingularButtons();
+			initRiveActionOverlayElements(); 
+			uiResizeHandler(); 
+			resizePublishPanel();
+			resizeTaskNavigator();
+			resizeOpenPanel();
+			resizeRNPPanel(); 
+			returnToHome();
+			initRNPButtons();
+
+			
+			
+			
+			tippy("#riveheadlinescont", {
+				content: `<b>Double-Click:</b> Return to main panel</b><br><b>Ctrl/CMD + Double-Click:</b> Rapid publish current file to task.`,
+				delay: 200,
+				maxWidth: 350,
+				placement: 'top',
+				allowHTML: true,
+				
+			});
+
+
+			tippy("#refreshspanbtn", {
+				content: 'Update and refresh data from ftrack',
+				delay: 350,
+				maxWidth: 200,
+				placement: 'left',
+				
+			});
+
+			//EVENT LISTENER FOR TASK FILTER SEARCH BOX
+			taskfilterbox.addEventListener('input', function(e) {
+				var targinput = e.target.value; // Use 'e' instead of 'event' for compatibility
+				var searchterm = targinput.toLowerCase();
+
+				var tasktablerows = activetasktable.getElementsByTagName("tr");
+
+				if (searchterm.length > 0) {
+					for (var i = 0; i < tasktablerows.length; i++) {
+						var td = tasktablerows[i].getElementsByTagName("td")[0]; // Get the first <td>
+						if (td) {
+							var nameSpan = td.getElementsByTagName("span")[1]; // The second span contains the name
+							if (nameSpan) {
+								var textValue = nameSpan.textContent || nameSpan.innerText;
+								if (textValue.toLowerCase().indexOf(searchterm) > -1) {
+									tasktablerows[i].style.display = "";
+								} else {
+									tasktablerows[i].style.display = "none";
+								}
+							}
+						}
+					}
+				} else {
+					// Reset: Show all rows if input is empty
+					for (var i = 0; i < tasktablerows.length; i++) {
+						tasktablerows[i].style.display = "";
+					}
+				}
+			});
+
+
+		});
+
+		var VISIBLE_PANEL = "HOME";
+		var MASTER_DD_STATS = [];
+		var START_IS_ENABLED = true;
+
+		// PROCESS CLEANUP UP BEFORE EXTENSION CLOSES
+		window.addEventListener("beforeunload", function (event) {
+
+			exitLogsPanel();
+
+			if (serverProcess) {
+				console.log('Killing WebSocket server...');
+				serverProcess.kill();
+			}
+
+			
+			// console.log(event);
+			watcherProcesses.forEach(proc => {
+				try {
+					console.log("Killing process: ", proc);
+					proc.kill(); // or proc.kill('SIGKILL') for force
+				} catch (e) {
+					console.warn("Failed to kill watcher process:", e);
+				}
+			});
+
+		});
+		
+		
+		
+	</script>
+	<!-- ------------------------------------------------------     RIVE INITIAL LOADING SCREEN     -------------------------------------------------------------------- -->
+	<!-- RIVE INITIAL LOADER ELEMENT -->
+	<div id="loadercontainer" class="riveloaderactive">
+		<canvas id="rive-canvas" width="500px" height="800px"></canvas>
+	</div>
+
+	<!-- PRIMARY WRAPPER FOR UI THAT ALLOW TO ACCOMODATE WINDOW SHIFTING -->
+	<div class="dummywrapper">
+	<div id="shifterpanel" class="fullwrapper">
+
+
+		<!-- ------------------------------------------------------     PUBLISH PANEL     -------------------------------------------------------------------- -->
+		<!-- PUBLISH PANEL -->
+		<!-- PUBLISH MAIN CONTAINER -->
+		<div id="publishpanel" class="publish-details-container ghostcontainer">
+
+			<!-- EMPTY WRAPPER -->
+			<div class="taskpanelemptywrapper">
+
+				<!-- STATUS LABEL -->
+				<div><p class="label-txt">Status:</p></div>
+
+				<!-- DROPDOWN SELECT -->
+				<div id="selectcontainer">
+					<div>
+						<select id="statselect" class="wide">
+							
+						</select>
+					</div>
+				</div>
+
+				<!-- DESCRIPTION LABEL -->
+				<div class="descriptionarea">
+					<div><p class="label-txt">Description:</p></div>
+					<div class="taskpanelemptywrapper">
+						<textarea id="pubdescriptiontxt" placeholder="Type a description (optional)..." ></textarea>
+					</div>
+				</div>
+
+				<!-- PUBLICATION ACTION BUTTON -->
+				<div id="rivepubactionbtncont" class="rivepubactionbtncontainer">
+					<canvas id="rive-canvas-pubaction-btn" class="rivepubactionbtncontainerflex rivebtnshadows"></canvas>
+				</div>
+			</div>
+			
+			
+		</div>
+
+
+		<!-- ------------------------------------------------------     OPEN PANEL     -------------------------------------------------------------------- -->
+		<!-- OPEN PANEL -->
+		<!-- OPEN MAIN CONTAINER -->
+		<div id="openpanel" class="open-main-container ghostcontainer">
+
+			<div class="openpanelemptywrapper">
+				<!-- COMPONENT LABEL -->
+				<div><p class="currprojlabel">Component:<span id="aecomponentname" class="currprojlabelname">8011_ATL.aep</span></p></div>
+
+				<!-- STATUS LABEL -->
+				<div><p class="components-label-txt">AE versions:</p></div>
+
+				<!-- DROPDOWN SELECT -->
+				<div id="versionselectdd">
+					<div>
+						<select id="versionselector" class="wide">
+							
+						</select>
+					</div>
+				</div>
+
+				<div class="openpanelemptywrapper elementspacer">
+					<!-- LINKED ASSETS -->
+					<div><p class="components-label-txt">Linked assets:</p></div>
+
+					<div id="linkedtablecont" class="linkedassetstablecontainer">
+						<table class="linked-table">
+							
+							<tbody class="linked-table linked-table-body" id="lnkdtblebody" tabindex="3">
+
+								
+							</tbody>
+						</table>
+					</div>
+
+					<!-- OPEN ACTION BUTTON -->
+					<div id="riveopenactionbtncont" class="riveopenactionbtncontainer">
+						<canvas id="rive-canvas-openaction-btn" class="rivebtnshadows" width="410px" height="80px"></canvas>
+					</div>
+				</div>
+
+			</div>
+			
+		</div>
+
+
+		<!-- ------------------------------------------------------     TASK NAVIGATOR PANEL     -------------------------------------------------------------------- -->
+		<!-- TASK NAVIGATOR PANEL -->
+		<!-- NAVIGATOR CONTAINER -->
+		<div id="taskbrowserpanel" class="browser-container ghostcontainer">
+
+			<!-- DUMMY WRAPPER TO HIDE SCROLLBAR -->
+			<div class="breadcrumbemptywrapper">
+					<!-- NAVIGATOR LABEL -->
+					<div class="taskbrowserheadline">Task Navigator</div>
+
+					<!-- NAVIGATOR BREADCRUMB -->
+					<div id="breadcrumbcontrow" class="breadcrumbrowcont">
+		
+						<div class="breadcrumbrow" id="breadcrumbnavrow">
+							
+							<div id="bcbtnhome" onclick="homeBreadcrumbClick()"><span class="breadcrumbbadge"><img class="breadcrumbiconhome"><span class="breadcrumbtext">Projects</span></span></div>
+							
+		
+						</div>
+					</div>
+
+
+					<!-- TASK SEARCH FILTER -->
+					<div class="search-container" id="searchcontainer">
+                        <div class="shot-search-bar" id="searchfilter">
+                            <input id="searchbar" type="text" name="search" placeholder="Search Item...">
+                        </div>
+                    </div>
+					
+					<!-- TASK NAVIGATOR TABLE -->
+					<div id="tasktablecont" class="tasktablecontainer">
+						<table class="task-table">
+							<thead id="tsktblheader">
+								<tr>
+								<th scope="col" style="border-right: solid 2px rgba(209, 220, 234, 0.1);">Name<span class="tableheadericondown"></span></th>
+								<th scope="col">Type</th>
+								</tr>
+							</thead>
+						
+							<tbody class="task-table task-table-body" id="tblebody" tabindex="3">
+		
+		
+								
+							
+							</tbody>
+						</table>
+					</div>
+
+					<!-- SELECT TASK ACTION BUTTON -->
+					<div id="riveselecttaskactionbtncont" class="riveselecttaskactionbtncontainer">
+						<canvas id="rive-canvas-selecttaskaction-btn" class="rivebtnshadows" width="690px" height="80px"></canvas>
+					</div>
+			</div>
+		</div>
+
+
+		<!-- ------------------------------------------------------     RENDER AND PUBLISH PANEL     -------------------------------------------------------------------- -->
+		<!-- RENDER AND PUBLISH PANEL -->
+		<!-- RENDER AND PUBLISH CONTAINER -->
+		<div id="renderpubpanel" class="rnp-main-container ghostcontainer">
+
+			<!-- DUMMY WRAPPER TO HIDE SCROLLBAR -->
+			<div class="rnpemptywrapper">
+
+					<!-- RNP LABEL -->
+					 <div>
+						<div id="rnpheadlinelabel" class="renderpubheadline">HiFi Render Queue</div>
+
+						<!-- <div class="settingsrow">
+							<div class="settingsgroup" style="margin-top: 1px">
+							
+								<div class="settingscellleft">
+									
+									<div class="settingstxt">Show all DB:</div>
+									
+								</div>
+								
+								<div class="settingscellright">
+
+									<div class="toggleblock">
+										<input type="checkbox" class="js-switch" id="showallprojectrows" checked/>
+										
+									</div>
+									
+									
+							
+								</div>
+								
+							</div>
+						</div> -->
+					 </div>
+					
+
+					<!-- TABLE HEADER -->
+					<div id="renderrowtablecont" class="renderrowstablecontainer">
+						<table class="renderrows-table">
+							<thead id="rrtblheader">
+								<tr>
+									<th scope="col" style="padding-left: 15px; width: 21%">Comp</th>
+									<th scope="col" style="width: 23%; text-align: left; padding-left: 40px">Audio</th>
+									<th scope="col" style="width: 25%; text-align: left; padding-left: 30px">Filename</th>
+									<th scope="col" style="width: 11%; text-align: center; padding-left: 13px">Status</th>
+									<th scope="col" style="text-align: center; padding-left: 5px">Activity</th>
+								</tr>
+							</thead>
+						</table>
+
+						
+					</div>
+
+					
+					<!-- PROGRESS BAR CONTAINER -->
+					
+					<div id="renderrowparentcont" class="renderrowsprogbarcontainer rowunlocked">
+
+					
+
+					</div>
+
+					<!-- MISSING COMPS LIST -->
+
+					<div id="missingcompswrapper" class="missingcompsemptywrapper missingcompselementspacer">
+						<!-- EXPECTED COMPS NOT IN PROJECT -->
+						<div>
+							<p id="misscompslabel" class="missingcomps-label-txt">Comp Info:</p>
+							
+						</div>
+						<div id="changemissingstats">
+								
+							<div style="margin-top: -30px; padding-bottom: 30px;"><span onclick="updateMissingStats()" id="updatestatsbtn" class="statsupdatebtn deactivate-stat-btn"><span class="statsupdatetxt">Update Statuses</span></span></div>
+						</div>
+	
+						<div id="missingcompscont" class="missingcompstablecontainer">
+							<table class="missing-comps-table">
+								<thead id="cmpinfotblheader">
+									<tr>
+									<th scope="col" style="border-right: solid 2px rgba(209, 220, 234, 0.1); width: 65%;">Comp</th>
+									<th scope="col" style="text-align: center; padding-right: 20px">Status</th>
+									</tr>
+								</thead>
+								<tbody class="missing-comps-table missing-comps-table-body" id="missingcompstblebody" tabindex="4">
+	
+									
+									
+								</tbody>
+							</table>
+						</div>
+	
+					</div>
+
+
+					<div class="rivernpbtngroupcontainer">
+
+						<!-- RNP START AND STOP BUTTON -->
+						<!-- START BUTTON -->
+						<div id="rivernpstartactionbtncont" class="rivernpstartbtncontainer">
+							<canvas id="rive-canvas-startaction-btn" class="rivebtnshadows" style="width: 450px; height: 80px"></canvas>
+						</div>
+
+						<!-- FARM BUTTON -->
+						<div id="rivernpfarmactionbtncont" class="rivernpfarmbtncontainer">
+							<canvas id="rive-canvas-farmaction-btn" class="rivebtnshadows" style="width: 450px; height: 80px"></canvas>
+						</div>
+
+						<!-- STOP BUTTON -->
+						<div id="rivernpstopactionbtncont" class="rivernpstopbtncontainer btn-inactive">
+							<canvas id="rive-canvas-stopaction-btn" class="rivebtnshadows" style="width: 450px; height: 80px"></canvas>
+						</div>
+
+					</div>
+					
+			</div>
+		</div>
+		
+		
+
+
+		<!-- ------------------------------------------------------     RIVE HEADLINE AND GROUPED BUTTON COMPONENTS     -------------------------------------------------------------------- -->
+		<!-- HEADLINE AND HERO RIVE ELEMENTS -->
+		<!-- RIVE MULTICOMP TXT CONT UI -->
+		<div id="rivemultitxtcont" class="rivemulticontainer">
+			<canvas id="rive-canvas-multicomp" width="90px" height="20px"></canvas>
+		</div>
+		<!-- RIVE HEADLINES CONT UI -->
+		<div id="riveheadlinescont" class="riveheroheadlinescontainer">
+			<canvas id="rive-canvas-headlines" width="500px" height="175px"></canvas>
+		</div>
+
+		<!-- BUTTON ELEMENTS -->
+		<!-- PRIMARY BUTTON ELEMENTS -->
+		<div id="riveprimarybtncont" class="riveprimarybtncontainer">
+			<canvas id="rive-canvas-primary-btn" class="riveprimarybtncontainerflex rivebtnshadows"></canvas>
+		</div>
+
+
+
+		<!-- RIVE BACKGROUND ELEMENTS -->
+		<!-- RIVE HERO BG MASK FOR THUMBNAIL -->
+		<!-- SVG CLIPPING PATH -->
+		<div id="clipsvg" class="thumbclippingcontainer">
+			<svg xmlns="http://www.w3.org/2000/svg">
+				<defs>
+					<clipPath id="thumb-mask">
+						<rect x="0" y="0" width="100%" height="100%" rx="30" fill="white" />
+					</clipPath>
+				</defs>
+			</svg>
+		</div>
+		
+
+		<!-- TASK THUMBNAIL IMAGE -->
+		<div id="taskthumbcont" class="taskthumbcontainer">
+			<img class="task-thumbnail" id="taskthumbimg" src='https://cobramachete.github.io/Ox-Cart/rive/thumbnail_llama.png' width="648px" height="365px">
+		</div>
+
+		<!-- RIVE ACTION OVERLAY -->
+		<div id="riveactionoverlaycont" class="riveactionoverlaycontainerinactive">
+			<canvas id="rive-canvas-action-overlay" width="500px" height="365px"></canvas>
+		</div>
+
+		<!-- RIVE HERO BG CONT UI -->
+		<div id="riveherobgcont" class="riveherobgcontainer">
+			<canvas class="riveshadows" id="rive-canvas-hero-bg" width="500px" height="365px"></canvas>
+		</div>
+
+		<!-- RIVE HERO GRADIENT CONT UI -->
+		<div id="riveherogradcont" class="riveherogradcontainer">
+			<canvas id="rive-canvas-hero-grad" width="500px" height="365px"></canvas>
+		</div>
+
+	</div>
+	</div>
+
+	<!-- REFRESH DATA BUTTON -->
+	 <div id="refreshbtncont">
+		<!-- <div><span class="refreshbtn"><img class="breadcrumbiconproject"><span class="breadcrumbtext">Basketball</span></span></div> -->
+		<div onclick="refreshGlobalEnvData(GLOBAL_FTRACK_SESSION, true)"><span id="refreshspanbtn" class="refreshbtn"><img class="refreshbtnicon"><span class="breadcrumbtext">Resync Data</span></span></div>
+	</div>
+
+	<!-- RIVE SPLIT BG UI -->
+	<div id="rivebgcont" class="rivebgcontainer">
+		<canvas id="rive-canvas-bg" width="500px" height="800px"></canvas>
+	</div>
+
+	<!------------------------- SETTINGS BUTTON ------------------------->
+	<div class = "settingsiconcontainer" id="settingsbtncontainer">
+		<div class = "settingsicon" id="settingsbtn" onclick="settingsIconClicked()"></div>
+	</div>
+
+
+	<!------------------------- SETTINGS PANEL ------------------------->
+	<div>
+		<div class="container settingsboxstart" id="settingspanel">
+
+            
+            <!-- GLOBAL SETTINGS -->  
+            <div class="settingsection">
+                <!-- GLOBAL SETTINGS GROUP START -->
+				
+
+                <div id="globallabelwrapper" class="settingscontainer" style="padding-bottom: 15px">
+
+					<div id="settingsclosebtncontainer" class="closesettingsicon">
+
+						<img id="closesettingsbtn" src="https://cobramachete.github.io/Ox-Cart/rive/icons/close_icon.svg" onclick="settingsIconClicked()" width="20" height="20">
+
+						<script>
+							const thecloseicon = document.getElementById('closesettingsbtn');
+							const thecloseiconcont = document.getElementById('settingsclosebtncontainer');
+							
+							thecloseicon.addEventListener('mouseenter', () => {
+								
+								thecloseicon.src = 'https://cobramachete.github.io/Ox-Cart/rive/icons/close_icon_hover.svg';
+								thecloseiconcont.classList.remove("closesettingsicon");
+								thecloseiconcont.classList.add("closesettingsiconhover");
+							});
+							
+							thecloseicon.addEventListener('mouseleave', () => {
+								
+								thecloseicon.src = 'https://cobramachete.github.io/Ox-Cart/rive/icons/close_icon.svg';
+
+								thecloseiconcont.classList.remove("closesettingsiconhover");
+								thecloseiconcont.classList.add("closesettingsicon");
+							});
+						</script>
+					</div>
+
+					
+                    <div class="settingsrow">
+                        <div class="settingsgrouptop">
+                            <div class="settingsheader" style="margin-left: auto; padding-left: 34px">Global</div>
+								
+                                <div id="logbtncontainer" class="livelogicon">
+                                    <img id="livelogbtn" src="https://cobramachete.github.io/Ox-Cart/rive/icons/live-log.svg" onclick="openDebugWindow()" width="30" height="30">
+
+                                    <script>
+                                        const logicon = document.getElementById('livelogbtn');
+                                        const logiconcont = document.getElementById('logbtncontainer');
+                                        
+                                        logicon.addEventListener('mouseenter', () => {
+											
+                                            logicon.src = 'https://cobramachete.github.io/Ox-Cart/rive/icons/live-log-hover.svg';
+                                            logiconcont.classList.remove("livelogicon");
+                                            logiconcont.classList.add("livelogiconhover");
+                                        });
+                                        
+                                        logicon.addEventListener('mouseleave', () => {
+                                            logicon.src = 'https://cobramachete.github.io/Ox-Cart/rive/icons/live-log.svg';
+
+                                            logiconcont.classList.remove("livelogiconhover");
+                                            logiconcont.classList.add("livelogicon");
+                                        });
+                                        </script>
+                                </div>
+
+								
+                              
+                            <!-- <div id="livelogbtn" class="livelogicon"></div> -->
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    
+                </div>
+
+                <!-- IMG SEQUENCE SETTINGS -->
+                <div class="settingsrow" style="margin-top: 20px">
+                    <div class="settingsgroup">
+
+                        <div class="settingscellleft">
+                            
+                                <div class="settingstxt">Render Format:</div>
+                            
+                        </div>
+                        
+                        <div class="settingscellright">
+                            
+                            <select id="codecdd" class="small" onchange="updateSettingsPrefs(this)">
+                                <option value="option1" selected>EXR</option>
+                                <option value="option2">PNG</option>
+                                
+                            </select>
+                                
+                        </div>
+                        
+                    </div>
+                </div>
+                
+
+
+                <!-- FORCE 29.97 -->
+                <div class="settingsrow">
+                    <div class="settingsgroup" style="margin-top: 20px">
+                    
+                        <div class="settingscellleft">
+                            
+                            <div class="settingstxt">Force 29.97 FPS:</div>
+                            
+                        </div>
+                        
+                        <div class="settingscellright">
+
+							<div class="toggleblock">
+								<input type="checkbox" class="js-switch" id="forceFPS" onchange="updateSettingsPrefs(this)" checked/>
+								<!-- <script>
+									var elemFPS = document.getElementById('forceFPS');
+									var init = new Switchery(elemFPS, {color: '#6d30cf80', size: 'small'});
+									
+								</script> -->
+							</div>
+                            
+                            
+                    
+                        </div>
+                        
+                    </div>
+                </div>
+                
+
+                <!-- Force Non-Linear -->
+                <div class="settingsrow">
+                    <div class="settingsgroup" style="margin-top: 20px;">
+                    
+                        <div class="settingscellleft">
+                            
+                                <div class="settingstxt">Force sRGB (March Madness):</div>
+                            
+                        </div>
+                        
+                        <div class="settingscellright">
+							<div class="toggleblock">
+								<input type="checkbox" class="js-switch" id="forcesrgb" onchange="updateSettingsPrefs(this)" checked/>
+								<!-- <script>
+									var elemsrgb = document.getElementById('forcesrgb');
+									var init = new Switchery(elemsrgb, {color: '#6d30cf80', size: 'small'});
+									
+								</script> -->
+							</div>
+								
+                                
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FARM SETTINGS -->      
+            <div class="settingssection" style="margin-top: 20px">
+
+                    <!-- FARM SETTINGS GROUP START -->
+                    <div id="farmlabelwrapper" class="settingscontainer">
+                        <!-- EXPECTED COMPS NOT IN PROJECT -->
+                        
+                        <div class="settingsheader">Farm</div>
+                        
+                            
+                    </div>
+
+                    <!-- NODE SETTINGS -->
+                    <div class="settingsrow" style="margin-top: 20px">
+                        <div class="settingsgroup">
+        
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Render Nodes:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+                        
+                                    <div id="rendernodesetddcontainer">
+                                        <div>
+                                            <select id="rendernodesetdd" class="small" onchange="updateSettingsPrefs(this)">
+                                                <option value="option1" selected>AWS and Local</option>
+                                                <option value="option2">AWS Only</option>
+                                                <option value="option3">Local Only</option>
+                                            </select>
+                                        </div>
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- JOB PRIORITY -->
+                    <div class="settingsrow" style="margin-top: 20px">
+                        <div class="settingsgroup">
+        
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Priority:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+                                
+                                <div class="settingstextfield">
+                                    <textarea id="priorityfield" placeholder="50" onchange="updateSettingsPrefs(this)"></textarea>
+                                </div>
+                                    
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+    
+                    <!-- RAM SETTINGS -->
+                    <div class="settingsrow" style="margin-top: 15px">
+                        <div class="settingsgroup">
+        
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">RAM Settings:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+                        
+                                    <div id="ramsetddcontainer">
+                                        <div>
+                                            <select id="ramsetdd" class="small" onchange="updateSettingsPrefs(this)">
+												<option value="option1">100</option>
+                                                <option value="option2">200</option>
+                                                <option value="option3" selected>400</option>
+                                                <option value="option4">800</option>
+                                            </select>
+                                        </div>
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+    
+                    <!-- FRAMES PER TASK SETTINGS -->
+                    <div class="settingsrow" style="margin-top: 20px">
+                        <div class="settingsgroup">
+        
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Nodes Per Task:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+                                
+                                <div class="settingstextfield">
+                                    <textarea id="fptfield" placeholder="5" onchange="updateSettingsPrefs(this)"></textarea>
+                                    
+                                </div>
+                                    
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- FORCE AE RENDER -->
+                    <!-- <div class="settingsrow forcedisablepref">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Force AE Render (Mac):</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="forceaerender" onchange="updateSettingsPrefs(this)" checked>
+									
+								</div>
+                                
+                                    
+                                    
+                            </div>
+                            
+                        </div>
+                    </div> -->
+
+                    <!-- RENDER TO TEMP -->
+                    <div class="settingsrow">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Render to Temp:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="rendertotemp" onchange="updateSettingsPrefs(this)" checked>
+									<!-- <script>
+										var elem = document.getElementById('rendertotemp');
+										var init = new Switchery(elem, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+									
+                                    
+                                    
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- VERIFY FILES -->
+                    <div class="settingsrow">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Verify Files:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="verifyfiles" onchange="updateSettingsPrefs(this)" checked>
+									<!-- <script>
+										var elem = document.getElementById('verifyfiles');
+										var init = new Switchery(elem, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+									
+                                    
+                                    
+                            </div>
+                            
+                        </div>
+                    </div>
+    
+                    <!-- SKIP EXISTING FRAMES -->
+                    <div class="settingsrow">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Skip Existing Frames:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="skipexisting" onchange="updateSettingsPrefs(this)" checked>
+									<!-- <script>
+										var elem = document.getElementById('skipexisting');
+										var init = new Switchery(elem, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+									
+                                    
+                                    
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- DELETE FRAMES -->
+                    <div class="settingsrow">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Delete Frames on Success:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="deleteframes" onchange="updateSettingsPrefs(this)" checked>
+									<!-- <script>
+										var elem = document.getElementById('deleteframes');
+										var init = new Switchery(elem, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+                                
+                                    
+                                    
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- REPLACE STATIC PNGS -->
+                    <!-- <div class="settingsrow forcedisablepref">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Replace Static PNGs:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="replacePNG" onchange="updateSettingsPrefs(this)" checked>
+									
+								</div>
+									
+                                    
+                                    
+                            </div>
+                            
+                        </div>
+                    </div> -->
+                    
+            </div>
+            
+            <!-- LOCAL SETTINGS -->
+            <div class="settingssection">
+
+                    <!-- LOCAL SETTINGS GROUP START -->
+                    <div id="locallabelwrapper" class="settingscontainer">
+                        
+                        <div class="settingsheader">Local</div>
+                            
+                    </div>
+    
+    
+                    <!-- MAX ACTIVE JOBS -->
+                    <div class="settingsrow" style="margin-top: 20px">
+
+                        <div class="settingsgroup">
+        
+                            <div class="settingscellleft">
+                                
+                                <div class="settingstxt">Max active jobs:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+                                
+                                <select id="maxjobsdd" class="small" onchange="updateSettingsPrefs(this)">
+                                    <option value="option1">1</option>
+                                    <option value="option2">2</option>
+                                    <option value="option3" selected>3</option>
+                                    <option value="option4">4</option>
+                                    <option value="option5">5</option>
+                                    <option value="option6">6</option>
+                                    <option value="option7">7</option>
+                                    <option value="option8">8</option>
+                                </select>
+                                    
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+    
+                    <!-- ENABLE MFR -->
+                    <div class="settingsrow" style="margin-top: 20px">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                    <div class="settingstxt">Enable MFR:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="mfrbtn" onchange="updateSettingsPrefs(this)" checked>
+									<!-- <script>
+										var elem = document.getElementById('mfrbtn');
+										var init = new Switchery(elem, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+									
+                            
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+    
+                    <!-- IGNORE MISSING FOOTAGE -->
+                    <div class="settingsrow" style="margin-top: 10px">
+                        <div class="settingsgroup">
+                        
+                            <div class="settingscellleft">
+                                
+                                <div class="settingstxt">Ignore missing footage:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="ignorebtn" onchange="updateSettingsPrefs(this)" checked/>
+									<!-- <script>
+										var elemignore = document.getElementById('ignorebtn');
+										var init = new Switchery(elemignore, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+									
+                                
+                                    
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+    
+                    <!-- PLAY SOUND ON COMPLETION -->
+                    <div class="settingsrow" style="margin-top: 10px">
+                        <div class="settingsgroup">
+                            
+                            <div class="settingscellleft">
+                                
+                                <div class="settingstxt">Play sound on completion:</div>
+                                
+                            </div>
+                            
+                            <div class="settingscellright">
+								<div class="toggleblock">
+									<input type="checkbox" class="js-switch" id="playsoundbtn" onchange="updateSettingsPrefs(this)" checked>
+									<!-- <script>
+										var elem = document.getElementById('playsoundbtn');
+										var init = new Switchery(elem, {color: '#6d30cf80', size: 'small'});
+									</script> -->
+								</div>
+									
+                                    
+                            </div>
+                            
+                        </div>
+
+                    </div>
+
+                    <div style="margin-bottom: 30px"></div>
+                    
+            </div>
+            
+
+
+		</div>
+	</div>
+
+	
+	<!------------------------- CONTEXT MENUS ------------------------->
+	<!-- RIGHT CLICK CONTEXT MENU -->
+	<div>
+		<nav id="context-menu" class="context-menu">
+			<ul class="context-menu__items">
+				<li class="context-menu__item" id="audioContext">
+				<a href="#" class="context-menu__link" data-action="Audio"><i style="padding-right: 8px" class="bi bi-soundwave"></i> Change Audio</a>
+				</li>
+				
+				<li class="context-menu__item" id="codecContext">
+				<a href="#" class="context-menu__link" data-action="Codec"><i style="padding-right: 8px" class="bi bi-filetype-mov"></i> Change Codec</a>
+					<ul class="context-menu_dropright context-menu__dr" id="dropdown-codecs">
+						<a href="#" class="context-menu__link" data-action="HiFi_Standard_EXR"><i style="padding-right: 8px" class="bi bi-dot"></i>Farm EXR</a>
+						<a href="#" class="context-menu__link" data-action="HiFi_Standard_PNG"><i style="padding-right: 8px" class="bi bi-dot"></i>Farm PNG</a>
+						<a href="#" class="context-menu__link" data-action="HiFi_MarchMadness_EXR"><i style="padding-right: 8px" class="bi bi-dot"></i>Farm EXR (March Madness)</a>
+						
+					</ul>
+				</li>
+	
+				<li class="context-menu__item disabled">
+				<a href="#" class="context-menu__link" data-action="Spacer">--------------------------------</a>
+				</li>
+	
+				<li class="context-menu__item" id="soloLocalContext">
+					<a href="#" class="context-menu__link" data-action="SoloLocal"><i style="padding-right: 8px" class="bi bi-geo-alt-fill"></i> Render Selected Locally</a>
+					</li>
+	
+				<li class="context-menu__item" id="soloRushContext">
+				<a href="#" class="context-menu__link" data-action="SoloRush"><i style="padding-right: 8px" class="bi bi-speedometer2"></i> Send Selected To Rush</a>
+				</li>
+	
+				<li class="context-menu__item" id="requeueFailedContext">
+				<a href="#" class="context-menu__link" data-action="Requeue"><i style="padding-right: 8px" class="bi bi-arrow-counterclockwise"></i> Requeue Failed Frames</a>
+				</li>
+	
+				<li class="context-menu__item" id="stopSoloContext">
+					<a href="#" class="context-menu__link" data-action="StopRender"><i style="padding-right: 8px" class="bi bi-slash-circle"></i> Kill Render</a>
+				</li>
+	
+				<li class="context-menu__item disabled">
+					<a href="#" class="context-menu__link" data-action="Spacer">--------------------------------</a>
+				</li>
+	
+				<li class="context-menu__item" id="resumeSequenceContext">
+					<a href="#" class="context-menu__link" data-action="ResumeSequence"><i style="padding-right: 8px" class="bi bi-sign-merge-right"></i> Resume Merge & Publish</a>
+				</li>
+	
+				<li class="context-menu__item" id="mergeContext">
+					<a href="#" class="context-menu__link" data-action="MergeFrames"><i style="padding-right: 8px" class="bi bi-intersect"></i> Start Merge</a>
+				</li>
+	
+				<li class="context-menu__item" id="publishContext">
+					<a href="#" class="context-menu__link" data-action="PublishItem"><i style="padding-right: 8px" class="bi bi-upload"></i> Publish Item</a>
+				</li>
+
+				<li class="context-menu__item disabled">
+					<a href="#" class="context-menu__link" data-action="Spacer">--------------------------------</a>
+				</li>
+
+				<li class="context-menu__item" id="removeContext">
+					<a href="#" class="context-menu__link" data-action="RemoveItem"><i style="padding-right: 8px" class="bi bi-x-circle-fill"></i> Remove</a>
+				</li>
+				
+			</ul>
+		</nav>
+		</div>
+	<!------------------------- CONTEXT MENUS ------------------------->
+	<!-- RIGHT CLICK CONTEXT MENU -->
+	<!-- <div>
+	<nav id="context-menu" class="context-menu">
+		<ul class="context-menu__items">
+			<li class="context-menu__item" id="audioContext">
+			<a href="#" class="context-menu__link" data-action="Audio"><i style="padding-right: 8px" class="bi bi-soundwave"></i> Change Audio</a>
+			</li>
+			
+			<li class="context-menu__item" id="codecContext">
+			<a href="#" class="context-menu__link" data-action="Codec"><i style="padding-right: 8px" class="bi bi-filetype-mov"></i> Change Codec</a>
+				<ul class="context-menu_dropright context-menu__dr" id="dropdown-codecs">
+					<a href="#" class="context-menu__link" data-action="HiFi_4444_Alpha"><i style="padding-right: 8px" class="bi bi-dot"></i>HiFi_4444_Alpha</a>
+					<a href="#" class="context-menu__link" data-action="HiFi_Standard_EXR"><i style="padding-right: 8px" class="bi bi-dot"></i>Farm EXR</a>
+					<a href="#" class="context-menu__link" data-action="HiFi_MarchMadness_EXR"><i style="padding-right: 8px" class="bi bi-dot"></i>Farm EXR (March Madness)</a>
+					<a href="#" class="context-menu__link" data-action="HiFi_Standard_PNG"><i style="padding-right: 8px" class="bi bi-dot"></i>Farm PNG</a>
+				</ul>
+			</li>
+
+			<li class="context-menu__item disabled">
+			<a href="#" class="context-menu__link" data-action="Spacer">--------------------------------</a>
+			</li>
+
+			<li class="context-menu__item" id="soloRushContext">
+			<a href="#" class="context-menu__link" data-action="SoloRush"><i style="padding-right: 8px" class="bi bi-speedometer2"></i> Send To Rush</a>
+			</li>
+
+			<li class="context-menu__item" id="requeueFailedContext">
+			<a href="#" class="context-menu__link" data-action="Requeue"><i style="padding-right: 8px" class="bi bi-arrow-counterclockwise"></i> Requeue Failed</a>
+			</li>
+
+			<li class="context-menu__item" id="stopSoloContext">
+				<a href="#" class="context-menu__link" data-action="StopSoloRush"><i style="padding-right: 8px" class="bi bi-slash-circle"></i> Kill Render</a>
+			</li>
+
+			<li class="context-menu__item disabled">
+				<a href="#" class="context-menu__link" data-action="Spacer">--------------------------------</a>
+			</li>
+
+			<li class="context-menu__item" id="mergeContext">
+				<a href="#" class="context-menu__link" data-action="MergeFrames"><i style="padding-right: 8px" class="bi bi-intersect"></i> Start Merge</a>
+			</li>
+
+			<li class="context-menu__item" id="publishContext">
+				<a href="#" class="context-menu__link" data-action="PublishItem"><i style="padding-right: 8px" class="bi bi-upload"></i> Publish Item</a>
+			</li>
+			
+		</ul>
+	</nav>
+	</div> -->
+	
+
+
+	
+
+	
+</body>
+<!-- DATABASE MANAGEMENT -->
+<script type="text/javascript" src="js/db/render_db_handler.js"></script>
+<script type="text/javascript" src="js/db/db_job_creator.js"></script>
+
+<!-- TOOLTIPS -->
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<script src="js/context-menu/right-context.js"></script>
+<script src="js/context-menu/context-helper.js"></script>
+<script>
+	
+	tippy("#livelogbtn", {
+		content: `Open live logging panel`,
+		delay: 200,
+		maxWidth: 350,
+		placement: 'top',
+		allowHTML: true,
+		
+	});
+</script>
+</html>
